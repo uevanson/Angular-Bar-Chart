@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "Angular_Candlestick_Chart": {
+    "Angular_Bar_Chart": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:application": {
@@ -33,7 +33,7 @@
               "node_modules/jquery/dist/jquery.min.js",
               "node_modules/bootstrap/dist/js/bootstrap.min.js",
               "node_modules/reflect-metadata/Reflect.js",
-              "node_modules/d3/dist/d3.min.js",
+              "node_modules/d3/dist/d3.min.js"
             ]
           },
           "configurations": {
