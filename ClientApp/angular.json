@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "Angular_Bar_Chart": {
+    "Angular_Candlestick_Chart": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:application": {
@@ -22,15 +22,19 @@
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
-            "tsConfig": "tsconfig.app.json",
-            "assets": [
-              "src/assets"
-            ],
+            "tsConfig": "src/tsconfig.app.json",
+            "assets": [ "src/assets" ],
             "styles": [
-              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "node_modules/bootswatch/slate/bootstrap.min.css",
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/core-js-bundle/minified.js",
+              "node_modules/jquery/dist/jquery.min.js",
+              "node_modules/bootstrap/dist/js/bootstrap.min.js",
+              "node_modules/reflect-metadata/Reflect.js",
+              "node_modules/d3/dist/d3.min.js",
+            ]
           },
           "configurations": {
             "production": {
@@ -69,10 +73,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "Angular_Bar_Chart:build:production"
+              "browserTarget": "Angular_Candlestick_Chart:build:production"
             },
             "development": {
-              "browserTarget": "Angular_Bar_Chart:build:development",
+              "browserTarget": "Angular_Candlestick_Chart:build:development",
               "proxyConfig": "proxy.conf.js"
             }
           },
@@ -81,7 +85,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "Angular_Bar_Chart:build"
+            "browserTarget": "Angular_Candlestick_Chart:build"
           }
         },
         "test": {
@@ -129,5 +133,5 @@
       }
     }
   },
-  "defaultProject": "Angular_Bar_Chart"
+  "defaultProject": "Angular_Candlestick_Chart"
 }
