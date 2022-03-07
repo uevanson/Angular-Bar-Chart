@@ -26,7 +26,7 @@ export class BarChartComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private dataSubscription: Subscription;
   @ViewChild('barChart', { static: true }) barChart?: ElementRef;
-  private candles: d3.Selection<SVGRectElement, RawHistoricData, SVGElement, unknown> | undefined;
+  private bars: d3.Selection<SVGRectElement, RawHistoricData, SVGElement, unknown> | undefined;
   private clipPath: d3.Selection<any, unknown, null, undefined> | undefined;
   private candleFill: string = "green";
   private data: RawHistoricData[] | undefined;
@@ -44,8 +44,7 @@ export class BarChartComponent implements OnInit, AfterViewInit, OnDestroy {
   private xScale: d3.ScaleBand<Date> | undefined;
   private xTicks: Date[] | undefined;
   private xAxis: d3.Axis<d3.AxisDomain> | undefined;
-  private xPadding: number = 0.5;
-  private yMin?: number | undefined;
+  private xPadding: number = 0.2;
   private yMax?: number | undefined;
   public yScale: d3.ScaleLinear<number, number, never>;
   private yAxis: d3.Axis<AxisDomain> | undefined;
@@ -133,16 +132,13 @@ export class BarChartComponent implements OnInit, AfterViewInit, OnDestroy {
     this.xScale = d3.scaleBand(this.xDomain, this.xRange).padding(this.xPadding);
     this.xTicks = this.weeksScale(d3.min(this.xDomain), d3.max(this.xDomain), 2, 1);
     this.xAxis = d3.axisBottom(this.xScale).tickFormat(d3.utcFormat(this.xFormat)).tickValues(this.xTicks);
-    var minP = +this.setMinValue(data, "low");
-    var maxP = +this.setMaxValue(data, "high");
-    var buffer = (maxP - minP) * 0.1;
-    this.yMin = minP - buffer;
+    var maxP: number = +this.setMaxValue(data, "volume");
+    var buffer = maxP * 0.1;
     this.yMax = maxP + buffer;
     this.filteredData = data;
-    this.yScale = d3.scaleLinear().domain([this.yMin, this.yMax]).range([this.innerHeight(this.defaultHeight), 0]).nice();
-    this.yMin = this.yScale.domain()[0];
+    this.yScale = d3.scaleLinear().domain([0, this.yMax]).range([this.innerHeight(this.defaultHeight), 0]).nice();
     this.yMax = this.yScale.domain()[1];
-    this.yAxis = d3.axisRight(this.yScale).tickFormat(d3.format(",.2f"));
+    this.yAxis = d3.axisRight(this.yScale).tickFormat(d3.format(",.0f"));
 
     if (!init) {
       this.svg.select<SVGGElement>('#xAxis')
@@ -195,55 +191,27 @@ export class BarChartComponent implements OnInit, AfterViewInit, OnDestroy {
         .attr("clip-path", "url(#clip)");
     }
 
-    this.clipPath.selectAll(".stem")
-      .data(data)
-      .join(
-        enter =>
-          enter
-            .append("line")
-            .attr("class", "stem")
-            .attr("x1", (d: RawHistoricData) => { console.log(d.date); return this.margin.left + this.xScale(d.date); })
-            .attr("x2", (d: RawHistoricData) => { return this.margin.left + this.xScale(d.date) })
-            .attr("y1", (d: RawHistoricData) => { return this.margin.top + this.yScale(d.high) })
-            .attr("y2", (d: RawHistoricData) => { return this.margin.top + this.yScale(d.low) })
-            .attr("stroke", (d: RawHistoricData) => { return (d.open === d.close) ? "silver" : (d.open > d.close) ? "red" : "green" })
-        ,
-        update =>
-          update
-            .attr("x1", (d: RawHistoricData) => { return this.margin.left + this.xScale(d.date) })
-            .attr("x2", (d: RawHistoricData) => { return this.margin.left + this.xScale(d.date) })
-            .attr("y1", (d: RawHistoricData) => { return this.margin.top + this.yScale(d.high) })
-            .attr("y2", (d: RawHistoricData) => { return this.margin.top + this.yScale(d.low) })
-            .attr("stroke", (d: RawHistoricData) => { return (d.open === d.close) ? "silver" : (d.open > d.close) ? "red" : "green" })
-        ,
-        exit =>
-          exit.attr("opacity", 0)
-            .attr("height", 0)
-            .transition()
-            .duration(this.transitionDuration)
-            .remove()
-      )
 
-    this.clipPath.selectAll(".candle")
+    this.clipPath.selectAll(".bar")
       .data(data)
       .join(
         enter =>
           enter
             .append("rect")
             .attr('x', (d: RawHistoricData) => { return this.margin.left + this.xScale(d.date) - this.xScale.bandwidth() / 2 })
-            .attr("class", "candle")
-            .attr('y', (d: RawHistoricData) => { return this.margin.top + this.yScale(Math.max(d.open, d.close)) })
+            .attr("class", "bar")
+            .attr('y', (d: RawHistoricData) => { return this.yScale(d.volume) })
             .attr('width', this.xScale.bandwidth())
-            .attr('height', (d: RawHistoricData) => { return (d.open === d.close) ? 1 : this.yScale(Math.min(d.open, d.close)) - this.yScale(Math.max(d.open, d.close)) })
+            .attr('height', (d: RawHistoricData) => { return this.innerHeight(this.defaultHeight) - this.yScale(d.volume) })
             .attr("fill", (d: RawHistoricData) => { return (d.open === d.close) ? "silver" : (d.open > d.close) ? "red" : this.candleFill })
             .attr("stroke", (d: RawHistoricData) => { return (d.open === d.close) ? "silver" : (d.open > d.close) ? "red" : "green" })
         ,
         update =>
           update
             .attr('x', (d: RawHistoricData) => { return this.margin.left + this.xScale(d.date) - this.xScale.bandwidth() / 2 })
-            .attr('y', (d: RawHistoricData) => { return this.margin.top + this.yScale(Math.max(d.open, d.close)) })
+            .attr('y', (d: RawHistoricData) => { return this.yScale(d.volume) })
             .attr('width', this.xScale.bandwidth())
-            .attr('height', (d: RawHistoricData) => (d.open === d.close) ? 1 : this.yScale(Math.min(d.open, d.close)) - this.yScale(Math.max(d.open, d.close)))
+            .attr('height', (d: RawHistoricData) => { return this.innerHeight(this.defaultHeight) - this.yScale(d.volume) })
             .attr("fill", (d: RawHistoricData) => (d.open === d.close) ? "silver" : (d.open > d.close) ? "red" : this.candleFill)
             .attr("stroke", (d: RawHistoricData) => (d.open === d.close) ? "silver" : (d.open > d.close) ? "red" : "green")
         ,
@@ -284,20 +252,13 @@ export class BarChartComponent implements OnInit, AfterViewInit, OnDestroy {
   private zoomed(event): void {
     this.xScale = this.xScale.range([0, this.innerWidth(this.defaultWidth)].map(d => event.transform.applyX(d)));
     this.yScale = this.yScale.range([this.innerHeight(this.defaultHeight), 0].map(d => event.transform.applyY(d)))
-    this.candles = this.clipPath.selectAll(".candle");
-    this.candles
+    this.bars = this.clipPath.selectAll(".bar");
+    this.bars
       .transition().ease(d3.easePolyInOut).duration(this.transitionDuration)
       .attr("x", (d: RawHistoricData) => { return this.margin.left + this.xScale(d.date) - this.xScale.bandwidth() / 2 })
       .attr("width", this.xScale.bandwidth())
-      .attr("y", (d: RawHistoricData) => { return this.margin.top + this.yScale(Math.max(d.open, d.close)) })
-      .attr("height", (d: RawHistoricData) => { return (d.open === d.close) ? 1 : this.yScale(Math.min(d.open, d.close)) - this.yScale(Math.max(d.open, d.close)) });
-    this.stems = this.clipPath.selectAll(".stem");
-    this.stems
-      .transition().ease(d3.easePolyInOut).duration(this.transitionDuration)
-      .attr("y1", (d: RawHistoricData) => { return this.margin.top + this.yScale(d.high) })
-      .attr("y2", (d: RawHistoricData) => { return this.margin.top + this.yScale(d.low) })
-      .attr("x1", (d: RawHistoricData) => { return this.margin.left + this.xScale(d.date) })
-      .attr("x2", (d: RawHistoricData) => { return this.margin.left + this.xScale(d.date) });
+      .attr('y', (d: RawHistoricData) => { return this.yScale(d.volume) })
+      .attr('height', (d: RawHistoricData) => { return this.innerHeight(this.defaultHeight) - this.yScale(d.volume) });
     this.svg.selectAll(".x-axis").call(this.xAxis);
     this.svg.selectAll(".y-axis").call(this.yAxis);
   }
@@ -309,14 +270,10 @@ export class BarChartComponent implements OnInit, AfterViewInit, OnDestroy {
     this.xDomain = this.weekdaysScale(this.xMin, this.xMax, 0);
     this.xScale = d3.scaleBand(this.xDomain, this.xRange).padding(this.xPadding);
     this.xTicks = this.weeksScale(d3.min(this.xDomain), d3.max(this.xDomain), 2, 1);
-
-    var minP: number = +this.setMinValue(this.filteredData, "low")
-    var maxP: number = +this.setMaxValue(this.filteredData, "high")
-    var buffer = (maxP - minP) * 0.1
-    this.yMin = minP - buffer
+    var maxP: number = +this.setMaxValue(this.filteredData, "volume")
+    var buffer = maxP * 0.1
     this.yMax = maxP + buffer
     this.yScale = this.yScale.rangeRound([this.innerHeight(this.defaultHeight), 0]);
-    this.yMin = this.yScale.domain()[0];
     this.yMax = this.yScale.domain()[1];
 
     this.svg.select("#rect")
@@ -343,7 +300,7 @@ export class BarChartComponent implements OnInit, AfterViewInit, OnDestroy {
       .transition().ease(d3.easePolyInOut)
       .duration(this.transitionDuration)
       .attr('transform', `translate(${this.innerWidth(this.defaultWidth) + this.margin.left}, ${this.margin.top})`)
-      .call(d3.axisRight(this.yScale).tickFormat(d3.format(",.2f")))
+      .call(d3.axisRight(this.yScale).tickFormat(d3.format(",.0f")))
       .selectAll("path, line")
       .attr("stroke", 'azure');
 
@@ -351,20 +308,13 @@ export class BarChartComponent implements OnInit, AfterViewInit, OnDestroy {
       .duration(this.transitionDuration)
       .attr("fill", 'azure');
 
-    this.candles = this.clipPath.selectAll(".candle");
-    this.candles
+    this.bars = this.clipPath.selectAll(".bar");
+    this.bars
       .transition().ease(d3.easePolyInOut).duration(this.transitionDuration)
       .attr("x", (d: RawHistoricData) => { return this.margin.left + this.xScale(d.date) - this.xScale.bandwidth() / 2 })
       .attr("width", this.xScale.bandwidth())
       .attr("y", (d: RawHistoricData) => { return this.margin.top + this.yScale(Math.max(d.open, d.close)) })
-      .attr("height", (d: RawHistoricData) => { return (d.open === d.close) ? 1 : this.yScale(Math.min(d.open, d.close)) - this.yScale(Math.max(d.open, d.close)) });
-    this.stems = this.clipPath.selectAll(".stem");
-    this.stems
-      .transition().ease(d3.easePolyInOut).duration(this.transitionDuration)
-      .attr("y1", (d: RawHistoricData) => { return this.margin.top + this.yScale(d.high) })
-      .attr("y2", (d: RawHistoricData) => { return this.margin.top + this.yScale(d.low) })
-      .attr("x1", (d: RawHistoricData) => { return this.margin.left + this.xScale(d.date) })
-      .attr("x2", (d: RawHistoricData) => { return this.margin.left + this.xScale(d.date) });
+      .attr('height', (d: RawHistoricData) => { return this.innerHeight(this.defaultHeight) - this.yScale(d.volume) });
   }
 
 }
