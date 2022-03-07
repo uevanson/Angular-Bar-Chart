@@ -251,7 +251,6 @@ export class BarChartComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private zoomed(event): void {
     this.xScale = this.xScale.range([0, this.innerWidth(this.defaultWidth)].map(d => event.transform.applyX(d)));
-    this.yScale = this.yScale.range([this.innerHeight(this.defaultHeight), 0].map(d => event.transform.applyY(d)))
     this.bars = this.clipPath.selectAll(".bar");
     this.bars
       .transition().ease(d3.easePolyInOut).duration(this.transitionDuration)
@@ -313,7 +312,7 @@ export class BarChartComponent implements OnInit, AfterViewInit, OnDestroy {
       .transition().ease(d3.easePolyInOut).duration(this.transitionDuration)
       .attr("x", (d: RawHistoricData) => { return this.margin.left + this.xScale(d.date) - this.xScale.bandwidth() / 2 })
       .attr("width", this.xScale.bandwidth())
-      .attr("y", (d: RawHistoricData) => { return this.margin.top + this.yScale(Math.max(d.open, d.close)) })
+      .attr('y', (d: RawHistoricData) => { return this.yScale(d.volume) })
       .attr('height', (d: RawHistoricData) => { return this.innerHeight(this.defaultHeight) - this.yScale(d.volume) });
   }
 
