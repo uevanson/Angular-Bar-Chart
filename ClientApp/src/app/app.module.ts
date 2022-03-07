@@ -5,7 +5,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 import { FetchDataService } from './fetch-data/fetch-data.service';
-import { CandlestickChartComponent } from './candlestick/candlestick-chart.component';
+import { BarChartComponent } from './bar/bar-chart.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +16,7 @@ import { CandlestickChartComponent } from './candlestick/candlestick-chart.compo
     HttpClientModule,
     FormsModule,
     RouterModule.forRoot([
-      { path: '', component: CandlestickChartComponent, pathMatch: 'full' }
+      { path: '', component: BarChartComponent, pathMatch: 'full' }
     ])
   ],
   providers: [
