@@ -29,18 +29,6 @@ export class BarChartComponent implements OnInit, AfterViewInit, OnDestroy {
   private candles: d3.Selection<SVGRectElement, RawHistoricData, SVGElement, unknown> | undefined;
   private clipPath: d3.Selection<any, unknown, null, undefined> | undefined;
   private candleFill: string = "green";
-  public displayDate: string | undefined;
-  public displayPrice: string | undefined;
-  public leftCrosshairWidth: number = 0;
-  public rightCrosshairWidth: number = 0;
-  public topCrosshairHeight: number = 0;
-  public bottomCrosshairHeight: number = 0;
-  public mouseWidthOffset: number = 30;
-  public mouseHeightOffset: number = 30;
-  public mouseTopBias: number = 5.5;
-  public mouseLeftBias: number = 1.5;
-  public showCrossHair: boolean = false;
-  public mouseOnChart: boolean = true;
   private data: RawHistoricData[] | undefined;
   private filteredData: HistoricData[] | undefined;
   public filterDate: number | undefined;
