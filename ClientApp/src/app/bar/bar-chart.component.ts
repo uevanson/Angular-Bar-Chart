@@ -130,7 +130,7 @@ export class BarChartComponent implements OnInit, AfterViewInit, OnDestroy {
     this.xRange = [0, this.innerWidth(this.defaultWidth)];
     this.xDomain = this.weekdaysScale(this.xMin, this.xMax, 1);
     this.xScale = d3.scaleBand(this.xDomain, this.xRange).paddingInner(this.xPadding).align(0.5);
-    this.xTicks = this.weeksScale(d3.min(this.xDomain), d3.max(this.xDomain), 2, 1);
+    this.xTicks = this.weeksScale(d3.min(this.xDomain), d3.max(this.xDomain), 2, 0);
     this.xAxis = d3.axisBottom(this.xScale).tickFormat(d3.utcFormat(this.xFormat)).tickValues(this.xTicks);
     var maxP: number = +this.setMaxValue(data, "volume");
     var buffer = maxP * 0.1;
@@ -140,6 +140,7 @@ export class BarChartComponent implements OnInit, AfterViewInit, OnDestroy {
     this.yMax = this.yScale.domain()[1];
     this.yAxis = d3.axisRight(this.yScale).tickFormat(d3.format(",.0f"));
 
+    data[data.length - 1].date = new Date(data[data.length - 1].date.setDate(data[data.length - 1].date.getDate() - 1)) // random hack required
     if (!init) {
       this.svg.select<SVGGElement>('#xAxis')
         .transition()
@@ -264,12 +265,9 @@ export class BarChartComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private resizeChart(): void {
-    this.xMin = this.setMinValue(this.filteredData, "date");
-    this.xMax = this.setMaxValue(this.filteredData, "date");
     this.xRange = [0, this.innerWidth(this.defaultWidth)];
-    this.xDomain = this.weekdaysScale(this.xMin, this.xMax, 1);
     this.xScale = d3.scaleBand(this.xDomain, this.xRange).paddingInner(this.xPadding).align(0.5);
-    this.xTicks = this.weeksScale(d3.min(this.xDomain), d3.max(this.xDomain), 2, 1);
+    this.xTicks = this.weeksScale(d3.min(this.xDomain), d3.max(this.xDomain), 2, 0);
     var maxP: number = +this.setMaxValue(this.filteredData, "volume")
     var buffer = maxP * 0.1
     this.yMax = maxP + buffer
