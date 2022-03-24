@@ -198,7 +198,7 @@ export class BarChartComponent implements OnInit, AfterViewInit, OnDestroy {
         enter =>
           enter
             .append("rect")
-            .attr('x', (d: RawHistoricData) => { return this.margin.left + this.xScale(d.date) - this.xScale.bandwidth() / 2 })
+            .attr('x', (d: RawHistoricData) => { return this.margin.left + this.xScale(d.date) })
             .attr("class", "bar")
             .attr('y', (d: RawHistoricData) => { return this.yScale(d.volume) })
             .attr('width', this.xScale.bandwidth())
@@ -208,7 +208,7 @@ export class BarChartComponent implements OnInit, AfterViewInit, OnDestroy {
         ,
         update =>
           update
-            .attr('x', (d: RawHistoricData) => { return this.margin.left + this.xScale(d.date) - this.xScale.bandwidth() / 2 })
+            .attr('x', (d: RawHistoricData) => { return this.margin.left + this.xScale(d.date) })
             .attr('y', (d: RawHistoricData) => { return this.yScale(d.volume) })
             .attr('width', this.xScale.bandwidth())
             .attr('height', (d: RawHistoricData) => { return this.innerHeight(this.defaultHeight) - this.yScale(d.volume) })
@@ -250,11 +250,12 @@ export class BarChartComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private zoomed(event): void {
-    this.xScale = this.xScale.range([0, this.innerWidth(this.defaultWidth)].map(d => event.transform.applyX(d)));
+    this.xScale = this.xScale.range([this.margin.left, this.innerWidth(this.defaultWidth)].map(d => event.transform.applyX(d)));
+    this.xAxis = d3.axisBottom(this.xScale).tickFormat(d3.utcFormat(this.xFormat)).tickValues(this.xTicks);
     this.bars = this.clipPath.selectAll(".bar");
     this.bars
       .transition().ease(d3.easePolyInOut).duration(this.transitionDuration)
-      .attr("x", (d: RawHistoricData) => { return this.margin.left + this.xScale(d.date) - this.xScale.bandwidth() / 2 })
+      .attr("x", (d: RawHistoricData) => { return this.margin.left + this.xScale(d.date) })
       .attr("width", this.xScale.bandwidth())
       .attr('y', (d: RawHistoricData) => { return this.yScale(d.volume) })
       .attr('height', (d: RawHistoricData) => { return this.innerHeight(this.defaultHeight) - this.yScale(d.volume) });
@@ -299,7 +300,7 @@ export class BarChartComponent implements OnInit, AfterViewInit, OnDestroy {
       .transition().ease(d3.easePolyInOut)
       .duration(this.transitionDuration)
       .attr('transform', `translate(${this.innerWidth(this.defaultWidth) + this.margin.left}, ${this.margin.top})`)
-      .call(d3.axisRight(this.yScale).tickFormat(d3.format(",.0f")))
+      .call(d3.axisRight(this.yScale).tickFormat(d3.format(",.1f")))
       .selectAll("path, line")
       .attr("stroke", 'azure');
 
@@ -310,7 +311,7 @@ export class BarChartComponent implements OnInit, AfterViewInit, OnDestroy {
     this.bars = this.clipPath.selectAll(".bar");
     this.bars
       .transition().ease(d3.easePolyInOut).duration(this.transitionDuration)
-      .attr("x", (d: RawHistoricData) => { return this.margin.left + this.xScale(d.date) - this.xScale.bandwidth() / 2 })
+      .attr("x", (d: RawHistoricData) => { return this.margin.left + this.xScale(d.date) })
       .attr("width", this.xScale.bandwidth())
       .attr('y', (d: RawHistoricData) => { return this.yScale(d.volume) })
       .attr('height', (d: RawHistoricData) => { return this.innerHeight(this.defaultHeight) - this.yScale(d.volume) });
