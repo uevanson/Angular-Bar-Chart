@@ -129,7 +129,7 @@ export class BarChartComponent implements OnInit, AfterViewInit, OnDestroy {
     this.xMax = this.setMaxValue(data, "date");
     this.xRange = [0, this.innerWidth(this.defaultWidth)];
     this.xDomain = this.weekdaysScale(this.xMin, this.xMax, 1);
-    this.xScale = d3.scaleBand(this.xDomain, this.xRange).padding(this.xPadding);
+    this.xScale = d3.scaleBand(this.xDomain, this.xRange).padding(this.xPadding).align(0.5);
     this.xTicks = this.weeksScale(d3.min(this.xDomain), d3.max(this.xDomain), 2, 1);
     this.xAxis = d3.axisBottom(this.xScale).tickFormat(d3.utcFormat(this.xFormat)).tickValues(this.xTicks);
     var maxP: number = +this.setMaxValue(data, "volume");
@@ -250,7 +250,7 @@ export class BarChartComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private zoomed(event): void {
-    this.xScale = this.xScale.range([this.margin.left, this.innerWidth(this.defaultWidth)].map(d => event.transform.applyX(d)));
+    this.xScale = this.xScale.range([this.margin.left, this.innerWidth(this.defaultWidth)].map(d => event.transform.applyX(d))).align(0.5);
     this.xAxis = d3.axisBottom(this.xScale).tickFormat(d3.utcFormat(this.xFormat)).tickValues(this.xTicks);
     this.bars = this.clipPath.selectAll(".bar");
     this.bars
@@ -267,8 +267,8 @@ export class BarChartComponent implements OnInit, AfterViewInit, OnDestroy {
     this.xMin = this.setMinValue(this.filteredData, "date");
     this.xMax = this.setMaxValue(this.filteredData, "date");
     this.xRange = [0, this.innerWidth(this.defaultWidth)];
-    this.xDomain = this.weekdaysScale(this.xMin, this.xMax, 0);
-    this.xScale = d3.scaleBand(this.xDomain, this.xRange).padding(this.xPadding);
+    this.xDomain = this.weekdaysScale(this.xMin, this.xMax, 1);
+    this.xScale = d3.scaleBand(this.xDomain, this.xRange).padding(this.xPadding).align(0.5);
     this.xTicks = this.weeksScale(d3.min(this.xDomain), d3.max(this.xDomain), 2, 1);
     var maxP: number = +this.setMaxValue(this.filteredData, "volume")
     var buffer = maxP * 0.1
