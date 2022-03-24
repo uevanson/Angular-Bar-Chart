@@ -129,7 +129,7 @@ export class BarChartComponent implements OnInit, AfterViewInit, OnDestroy {
     this.xMax = this.setMaxValue(data, "date");
     this.xRange = [0, this.innerWidth(this.defaultWidth)];
     this.xDomain = this.weekdaysScale(this.xMin, this.xMax, 1);
-    this.xScale = d3.scaleBand(this.xDomain, this.xRange).padding(this.xPadding).align(0.5);
+    this.xScale = d3.scaleBand(this.xDomain, this.xRange).paddingInner(this.xPadding).align(0.5);
     this.xTicks = this.weeksScale(d3.min(this.xDomain), d3.max(this.xDomain), 2, 1);
     this.xAxis = d3.axisBottom(this.xScale).tickFormat(d3.utcFormat(this.xFormat)).tickValues(this.xTicks);
     var maxP: number = +this.setMaxValue(data, "volume");
@@ -155,7 +155,7 @@ export class BarChartComponent implements OnInit, AfterViewInit, OnDestroy {
         .duration(this.transitionDuration)
         .delay(this.transitionDuration)
         .attr('transform', `translate(${this.innerWidth(this.defaultWidth) + this.margin.left}, ${this.margin.top})`)
-        .call(d3.axisRight(this.yScale).tickFormat(d3.format(",.2f")))
+        .call(d3.axisRight(this.yScale).tickFormat(d3.format(",.0f")))
         .selectAll("path, line")
         .attr("stroke", 'azure')
 
@@ -268,7 +268,7 @@ export class BarChartComponent implements OnInit, AfterViewInit, OnDestroy {
     this.xMax = this.setMaxValue(this.filteredData, "date");
     this.xRange = [0, this.innerWidth(this.defaultWidth)];
     this.xDomain = this.weekdaysScale(this.xMin, this.xMax, 1);
-    this.xScale = d3.scaleBand(this.xDomain, this.xRange).padding(this.xPadding).align(0.5);
+    this.xScale = d3.scaleBand(this.xDomain, this.xRange).paddingInner(this.xPadding).align(0.5);
     this.xTicks = this.weeksScale(d3.min(this.xDomain), d3.max(this.xDomain), 2, 1);
     var maxP: number = +this.setMaxValue(this.filteredData, "volume")
     var buffer = maxP * 0.1
@@ -300,7 +300,7 @@ export class BarChartComponent implements OnInit, AfterViewInit, OnDestroy {
       .transition().ease(d3.easePolyInOut)
       .duration(this.transitionDuration)
       .attr('transform', `translate(${this.innerWidth(this.defaultWidth) + this.margin.left}, ${this.margin.top})`)
-      .call(d3.axisRight(this.yScale).tickFormat(d3.format(",.1f")))
+      .call(d3.axisRight(this.yScale).tickFormat(d3.format(",.0f")))
       .selectAll("path, line")
       .attr("stroke", 'azure');
 
